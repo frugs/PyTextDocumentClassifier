@@ -2,7 +2,8 @@ import math
 
 
 def classify_input(network, input_data, positive_classification_predicate):
-    return positive_classification_predicate(network.compute_outputs(input_data)[-1])
+    input_shape = (network.layers[0].weights.shape[1], 1)
+    return positive_classification_predicate(network.compute_outputs(input_data.reshape(input_shape))[-1])
 
 
 def measure_error(network, test_data_set):

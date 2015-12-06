@@ -23,41 +23,44 @@ def words_from_file(file_object):
 
 
 def words_from_email(message):
-    def pair_part_content_type_with_part_content(part):
-        return part.get_content_type(), words_from_email(part)
+    def recurse(message_part):
+        if message_part.is_multipart():
+            parts = [recurse(part) for part in message_part.get_payload()]
+            text_plain_parts = [part
+                                for part
+                                in parts
+                                if "text/plain" in part[0].lower()]
 
-    if message.is_multipart():
-        part_contents = [pair_part_content_type_with_part_content(part) for part in message.get_payload()]
-        text_plain_parts = [part_content[1]
-                            for part_content
-                            in part_contents
-                            if part_content[0].startswith("text/plain")]
+            if len(text_plain_parts) > 0:
+                return text_plain_parts[0]
 
-        if len(text_plain_parts) > 0:
-            return text_plain_parts[0]
+            text_html_parts = [part
+                                for part
+                                in parts
+                                if "text/html" in part[0].lower()]
 
-        text_html_parts = [part_content[1]
-                            for part_content
-                            in part_contents
-                            if part_content[0].startswith("text/html")]
+            if len(text_html_parts) > 0:
+                return text_html_parts[0]
 
-        if len(text_html_parts) > 0:
-            return text_html_parts[0]
+            return "", []
 
-        return []
+        else:
+            content_type = message_part.get_content_type().lower()
+            if "text/plain" in content_type or "text/html" in content_type:
+                payload = message_part.get_payload(decode=True)
 
-    else:
-        if "text/plain" in message.get_content_type() or "text/html" in message.get_content_type():
-            payload = message.get_payload(decode=True)
+                html = bs4.BeautifulSoup(payload, "lxml")
+                for style_elem in html.find_all("style"):
+                    style_elem.extract()
 
-            html = bs4.BeautifulSoup(payload, "lxml")
-            for style_elem in html.find_all("style"):
-                style_elem.extract()
+                lines = [line.strip() for line in html.text.splitlines()]
+                line_words_in_lines = [line.split() for line in lines]
+                words = [normalise_word(word) for line_words in line_words_in_lines for word in line_words]
+                return content_type, [word for word in words if not word == ""]
+            else:
+                return "", []
 
-            lines = [line.strip() for line in html.text.splitlines()]
-            line_words_in_lines = [line.split() for line in lines]
-            words = [normalise_word(word) for line_words in line_words_in_lines for word in line_words]
-            return [word for word in words if not word == ""]
+    return recurse(message)[1]
 
 
 def create_classified_data_set(document_vectors, classification_vector):
