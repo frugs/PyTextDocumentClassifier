@@ -49,7 +49,7 @@ def words_from_email(message):
         if "text/plain" in message.get_content_type() or "text/html" in message.get_content_type():
             payload = message.get_payload(decode=True)
 
-            html = bs4.BeautifulSoup(payload)
+            html = bs4.BeautifulSoup(payload, "lxml")
             for style_elem in html.find_all("style"):
                 style_elem.extract()
 
