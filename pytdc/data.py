@@ -12,7 +12,8 @@ def normalise_word(word):
 
 
 def word_list_from_document_content(document_content):
-    return [normalise_word(word) for word in document_content.split()]
+    words = [normalise_word(word) for word in document_content.split()]
+    return [word for word in words if not word == ""]
 
 
 def words_from_file(file_object):
@@ -55,7 +56,8 @@ def words_from_email(message):
 
             lines = [line.strip() for line in html.text.splitlines()]
             line_words_in_lines = [line.split() for line in lines]
-            return [normalise_word(word) for line_words in line_words_in_lines for word in line_words]
+            words = [normalise_word(word) for line_words in line_words_in_lines for word in line_words]
+            return [word for word in words if not word == ""]
 
 
 def create_classified_data_set(document_vectors, classification_vector):
