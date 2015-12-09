@@ -4,7 +4,7 @@ setup(
     name='PyTextDocumentClassification',
     version='0.1',
     packages=['pytdc'],
-    url='https://github.com/frugs/PyDeepLearning',
+    url='https://github.com/frugs/PyTextDocumentClassification',
     license='MIT',
     author='Hugo Wainwright',
     author_email='frugs@github.com',
