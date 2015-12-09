@@ -9,8 +9,8 @@ setup(
     author='Hugo Wainwright',
     author_email='frugs@github.com',
     description='Text document classification library using PyDeepLearning and NumPy.',
-    data_files=[("", ["LICENSE.txt"])],
     classifiers=['Development Status :: 3 - Alpha',
                  'License :: OSI Approved :: MIT License',
-                 'Programming Language :: Python :: 3'], requires=['numpy']
+                 'Programming Language :: Python :: 3'],
+    requires=['numpy', 'PyDeepLearning']
 )
